@@ -102,13 +102,14 @@ class LiveForecast:
         cur.execute(fetch_gaps_query)
         rows = cur.fetchall()
         print(rows)
-        if len(rows) > 0:
+        if len(rows) > 0 and not hasattr(self, 'incident_sent'):
             self.send_incident(
                 {
                     "message": "Gaps in data",
                     "description": f"Gaps in data: {rows}",
                 }
             )
+            self.incident_sent = True
 
     def coinmetrics_on_open(self, ws):
         self.log_file.write("Connection is open\n")
