@@ -83,7 +83,10 @@ class LiveForecast:
 
         if self.lazy_counter % 10 == 0:
             # Blocking call for 10 seconds
+            self.log_file.write("Sleeping for 10 seconds\n")
+            self.log_file.flush()
             time.sleep(10)
+            self.lazy_counter = 0
 
         fetch_gaps_query = """
         WITH numbered_rows AS (
