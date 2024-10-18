@@ -27,6 +27,7 @@ class LiveForecast:
         self.betterstack_api_key = os.getenv("BETTERSTACK_API_KEY")
         self.betterstack_incident_name = os.getenv("BETTERSTACK_INCIDENT_NAME")
         self.betterstack_incident_requester_email = os.getenv("BETTERSTACK_INCIDENT_REQUESTER_EMAIL")
+        self.lazy_counter = 0
 
     def run(self):
         print("Starting live forecast")
@@ -71,7 +72,7 @@ class LiveForecast:
         timestamp = asset["time"]
         self.log_file.write(f"{timestamp} - {asset}\n")
         self.log_file.flush()
-
+        self.lazy_counter += 1
         # Simulate a write and fetch from the database
         # insert into test (time, asset, ReferenceRateUSD, cm_sequence_id) values (?, ?, ?, ?)
         cur.execute(
@@ -79,6 +80,10 @@ class LiveForecast:
             (timestamp, asset["asset"], asset["ReferenceRateUSD"], asset["cm_sequence_id"]),
         )
         con.commit()
+
+        if self.lazy_counter % 10 == 0:
+            # Blocking call for 10 seconds
+            time.sleep(10)
 
         fetch_gaps_query = """
         WITH numbered_rows AS (
